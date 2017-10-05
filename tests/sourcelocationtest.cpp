@@ -52,7 +52,7 @@ private slots:
         QCOMPARE(loc.column(), 87);
         QStringLiteral("/some/file:79:88");
         loc = SourceLocation::fromOneBased(QUrl(QStringLiteral("file:///some/file")), 0, 0);
-        QVERIFY(loc.isValid() == false);
+        QVERIFY(loc.isValid() == true);
         loc = SourceLocation::fromOneBased(QUrl(QStringLiteral("file:///some/file")), 1, 1);
         QVERIFY(loc.isValid() == true);
         QCOMPARE(loc.line(), 0);
