@@ -18,7 +18,6 @@ endif()
 
 if(WIN32)
   list(APPEND gammaray_probe_srcs
-    entry_win.cpp
     winfunctionoverwriter.cpp
   )
 endif()
@@ -51,11 +50,23 @@ set_target_properties(gammaray_probe PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${GAMMARAY_OUTPUT_PREFIX}/${PROBE_INSTALL_DIR}"
 )
 
+if(WIN32)
+  add_library(gammaray_probe_win SHARED entry_win.cpp)
+  set_target_properties(gammaray_probe_win PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY "${GAMMARAY_OUTPUT_PREFIX}/${PROBE_INSTALL_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${GAMMARAY_OUTPUT_PREFIX}/${PROBE_INSTALL_DIR}"
+  )
+endif()
+
 if(NOT GAMMARAY_INSTALL_QT_LAYOUT)
   set_target_properties(gammaray_probe PROPERTIES PREFIX "")
   install(TARGETS gammaray_probe DESTINATION ${PROBE_INSTALL_DIR})
   if(MSVC)
     install(FILES "$<TARGET_PDB_FILE_DIR:gammaray_core>/$<TARGET_PDB_FILE_NAME:gammaray_core>" DESTINATION ${PROBE_INSTALL_DIR} CONFIGURATIONS Debug RelWithDebInfo)
+  endif()
+  if(WIN32)
+    set_target_properties(gammaray_probe_win PROPERTIES PREFIX "")
+    install(TARGETS gammaray_probe_win DESTINATION ${PROBE_INSTALL_DIR})
   endif()
 else()
   set_target_properties(gammaray_probe PROPERTIES OUTPUT_NAME gammaray_probe-${GAMMARAY_PROBE_ABI})
@@ -71,8 +82,16 @@ else()
 
     install(FILES ${PRI_FILENAME} DESTINATION ${ECM_MKSPECS_INSTALL_DIR})
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gammaray_probe-android-dependencies.xml DESTINATION ${LIB_INSTALL_DIR})
+
+    if(WIN32)
+      set_target_properties(gammaray_probe_win PROPERTIES OUTPUT_NAME gammaray_probe_win-${GAMMARAY_PROBE_ABI})
+      install(TARGETS gammaray_probe_win ${INSTALL_TARGETS_DEFAULT_ARGS})
+    endif()
   else()
     install(TARGETS gammaray_probe ${INSTALL_TARGETS_DEFAULT_ARGS})
+  if(WIN32)
+    install(TARGETS gammaray_probe_win ${INSTALL_TARGETS_DEFAULT_ARGS})
+  endif()
   endif()
       if(MSVC)
       install(FILES "$<TARGET_PDB_FILE_DIR:gammaray_core>/$<TARGET_PDB_FILE_NAME:gammaray_core>" DESTINATION ${BIN_INSTALL_DIR} CONFIGURATIONS Debug RelWithDebInfo)

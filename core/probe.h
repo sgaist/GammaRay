@@ -40,6 +40,10 @@
 #include <QSet>
 #include <QVector>
 
+#ifdef Q_OS_WIN
+#include <qt_windows.h>
+#endif
+
 #include <memory>
 
 #if defined(Q_OS_UNIX) && !defined(Q_OS_ANDROID)
@@ -99,6 +103,13 @@ public:
      * Returns true if the probe is initialized, false otherwise.
      */
     static bool isInitialized();
+
+#ifdef Q_OS_WIN
+    /**
+     * Set the HANDLE to the the probeloader on Windows
+     */
+    static void setProbeLoader(HMODULE probeLoader);
+#endif
 
     static void objectAdded(QObject *obj, bool fromCtor = false);
     static void objectRemoved(QObject *obj);
@@ -225,6 +236,10 @@ private:
 
     explicit Probe(QObject *parent = nullptr);
     static QAtomicPointer<Probe> s_instance;
+
+#ifdef Q_OS_WIN
+    static HMODULE s_probeLoaderHandle;
+#endif
 
     /** Set up all needed signal spy callbacks. */
     void setupSignalSpyCallbacks();

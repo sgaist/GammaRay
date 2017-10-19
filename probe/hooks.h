@@ -31,6 +31,10 @@
 
 #include <qglobal.h>
 
+#ifdef Q_OS_WIN
+#include <qt_windows.h>
+#endif
+
 QT_BEGIN_NAMESPACE
 class QObject;
 QT_END_NAMESPACE
@@ -52,6 +56,10 @@ extern Q_DECL_EXPORT void gammaray_removeObject(QObject *obj);
 
 /** Entry point for startup injection. */
 extern Q_DECL_EXPORT void gammaray_probe_inject();
+
+#ifdef Q_OS_WIN
+extern Q_DECL_EXPORT void gammaray_probe_inject_win(HMODULE probeLoader);
+#endif
 
 /** Entry point for runtime attaching.
  *  This differs from the above by also attempting to re-send

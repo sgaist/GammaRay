@@ -168,6 +168,8 @@ void Hooks::installHooks()
 #endif
 }
 
+
+
 extern "C" Q_DECL_EXPORT void gammaray_probe_inject()
 {
     if (!qApp) {
@@ -176,6 +178,16 @@ extern "C" Q_DECL_EXPORT void gammaray_probe_inject()
     log_injection("gammaray_probe_inject()\n");
     new ProbeCreator(ProbeCreator::Create | ProbeCreator::FindExistingObjects);
 }
+
+#ifdef Q_OS_WIN
+extern "C" Q_DECL_EXPORT void gammaray_probe_inject_win(HMODULE probeLoader)
+{
+    Probe::setProbeLoader(probeLoader);
+    Hooks::installHooks();
+    if (!Probe::isInitialized())
+        gammaray_probe_inject();
+}
+#endif
 
 extern "C" Q_DECL_EXPORT void gammaray_probe_attach()
 {

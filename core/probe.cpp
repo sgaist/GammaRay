@@ -105,6 +105,10 @@ using namespace std;
 
 QAtomicPointer<Probe> Probe::s_instance = QAtomicPointer<Probe>(nullptr);
 
+#ifdef Q_OS_WIN
+HMODULE Probe::s_probeLoaderHandle = nullptr;
+#endif
+
 namespace GammaRay {
 static void signal_begin_callback(QObject *caller, int method_index, void **argv)
 {
@@ -289,6 +293,12 @@ Probe::~Probe()
     VariantHandler::clear();
 
     s_instance = QAtomicPointer<Probe>(nullptr);
+#ifdef Q_OS_WIN
+    if (s_probeLoaderHandle) {
+        FreeLibrary(s_probeLoaderHandle);
+        s_probeLoaderHandle = nullptr;
+    }
+#endif
 }
 
 void Probe::setWindow(QObject *window)
@@ -318,6 +328,11 @@ Probe *GammaRay::Probe::instance()
 bool Probe::isInitialized()
 {
     return instance();
+}
+
+void Probe::setProbeLoader(HMODULE probeLoader)
+{
+    s_probeLoaderHandle = probeLoader;
 }
 
 bool Probe::canShowWidgets()
